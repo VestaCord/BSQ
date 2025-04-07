@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_read_map.c                                        :+:      :+:    :+:   */
+/*   map_check.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:43:04 by jia-lim           #+#    #+#             */
-/*   Updated: 2025/04/07 20:20:21 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/07 20:53:44 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 // Returns the number of lines from information on the map
 // Moves fileptr (c) to next char (empty)
-unsigned int	get_map_size(int fd, char *c)
+unsigned int	ft_get_rows(int fd, char *c)
 {
 	unsigned int	size;
 
@@ -40,41 +40,77 @@ unsigned int	get_map_size(int fd, char *c)
 
 // returns c if printable
 // returns 0 if newline or invalid read
-// moves fileptr (c) to next char (obs/full)
-char	get_map_eof(int fd, char *c)
+// moves fileptr (c) to next char (obs/full/newline)
+char	ft_get_map_key(int fd, char *c)
 {
-	char	eof;
+	char	key;
 
-	eof = 0;
+	key = 0;
 	if (*c >= 32 && *c <= 126)
-		eof = *c;
+		key = *c;
 	if (*c != '\n')
 	{
 		if (read(fd, c, 1) <= 0)
-			eof = 0;
+			key = 0;
 	}
-	return (eof);
+	return (key);
 }
 
-// returns map if rectangular, legend is full, 
-t_map	ft_read_map(int fd)
+// returns cols of first row
+// returns 0 if non newline after legend
+unsigned int	ft_get_cols(int fd, char *c)
+{
+	int	cols;
+
+	cols = 0;
+	if (*c != '\n')
+		return (cols);
+	while (read(fd, c, 1) > 0)
+	{
+		if (*c == '\n')
+			return (cols);
+		if (*c >= 32 && *c <= 126)
+			cols++;
+	}
+	return (0);
+}
+
+// returns map with 0 for legends that were not found
+// moves from row, to emp obs ful, to newline, then cols
+t_map	ft_read_map(char *filename)
 {
 	t_map	map;
+	int		fd;
 	char	c;
 
-	map.cols = 0;
-	map.rows = get_map_size(fd, &c);
-	map.emp = get_map_eof(fd, &c);
-	map.obs = get_map_eof(fd, &c);
-	map.ful = get_map_eof(fd, &c);
+	fd = open(filename, O_RDONLY);
+	if (fd < 0)
+	{
+		map.rows = 0;
+		map.emp = 0;
+		map.obs = 0;
+		map.ful = 0;
+		map.cols = 0;
+		return (map);
+	}
+	map.rows = ft_get_rows(fd, &c);
+	map.emp = ft_get_map_key(fd, &c);
+	map.obs = ft_get_map_key(fd, &c);
+	map.ful = ft_get_map_key(fd, &c);
+	map.cols = ft_get_cols(fd, &c);
 	close(fd);
 	return (map);
 }
 
-// returns failure if invalid map
-int	ft_check_map(t_map map)
+// returns failure if inconsistent cols, missing keys, invalid key
+int	ft_check_map(char *filename, t_map map)
 {
-	if (!map.rows || !map.emp || !map.obs || !map.ful)
+	int	fd;
+
+	fd = open(filename, O_RDONLY);
+	if (fd < 0)
+		return (E_FAILURE);
+	if (!map.rows || !map.cols || !map.emp || !map.obs || !map.ful)
 		return (E_FAILURE);
 	return (E_SUCCESS);
 }
@@ -82,21 +118,21 @@ int	ft_check_map(t_map map)
 // no file passed in, read single file from standard input
 int	main(int argc, char *argv[])
 {
-	t_map	map;
-	int		fd;
+	t_map		map;
+	char		*filename;
+	const char	*filename_default = "/dev/stdin";
 
 	if (argc == 1)
-		fd = 0;
+		filename = (char *)filename_default;
 	else if (argc == 2)
-		fd = open(argv[1], O_RDONLY);
+		filename = argv[1];
 	else
 		return (1);
-	if (fd < 0)
-		return (1);
-	map = ft_read_map(fd);
-	if (ft_check_map(map) == E_FAILURE)
+	map = ft_read_map(filename);
+	if (ft_check_map(filename, map) == E_FAILURE)
 	{
 		write(1, "map error\n", 11);
+		return (1);
 	}
 	printf("emp=%c\nobs=%c\nful=%c\n", map.emp, map.obs, map.ful);
 	printf("cols=%d\n", map.cols);
