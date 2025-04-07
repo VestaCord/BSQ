@@ -1,17 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   map_check.c                                        :+:      :+:    :+:   */
+/*   ft_read_map.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jia-lim <jia-lim@student.42.fr>            +#+  +:+       +#+        */
+/*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:43:04 by jia-lim           #+#    #+#             */
-/*   Updated: 2025/04/07 16:43:28 by jia-lim          ###   ########.fr       */
+/*   Updated: 2025/04/07 20:20:21 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header.h"
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "bsq.h"
 
+// Returns the number of lines from information on the map
+// Moves fileptr (c) to next char (empty)
 unsigned int	get_map_size(int fd, char *c)
 {
 	unsigned int	size;
@@ -32,6 +38,9 @@ unsigned int	get_map_size(int fd, char *c)
 	return (size);
 }
 
+// returns c if printable
+// returns 0 if newline or invalid read
+// moves fileptr (c) to next char (obs/full)
 char	get_map_eof(int fd, char *c)
 {
 	char	eof;
@@ -47,91 +56,49 @@ char	get_map_eof(int fd, char *c)
 	return (eof);
 }
 
-int	obs_count_helper(char c, t_map *map, t_point *point, int *obs_count)
+// returns map if rectangular, legend is full, 
+t_map	ft_read_map(int fd)
 {
-	if (c == map->emp || c == map->obs)
-	{
-		point->x++;
-		if (c == map->obs)
-			(*obs_count)++;
-	}
-	else if (c == '\n')
-	{
-		if (point->y == 0)
-			map->cols = point->x;
-		else if (point->x != map->cols)
-			return (0);
-		point->x = 0;
-		point->y++;
-	}
-	else
-		return (0);
-	return (1);
-}
-
-int	get_obs_count(int fd, t_map *map)
-{
-	int		obs_count;
-	int		col_count;
-	char	c;
-	t_point	point;
-
-	obs_count = 0;
-	col_count = 0;
-	point.x = 0;
-	point.y = 0;
-	while (point.y < map->rows)
-	{
-		if (read(fd, &c, 1) <= 0)
-			break ;
-		if (obs_count_helper(c, map, &point, &obs_count) == 0)
-			return (-1);
-	}
-	if (point.y == map->rows && read(fd, &c, 1) == 0)
-		return (obs_count);
-	return (-1);
-}
-
-t_map	*map_check(char *input_file)
-{
-	int		fd;
-	t_map	*map;
+	t_map	map;
 	char	c;
 
-	fd = open(input_file, O_RDONLY);
-	if (fd < 0)
-		return (NULL);
-	map = (t_map *)malloc(sizeof(t_map));
-	map->rows = get_map_size(fd, &c);
-	map->emp = get_map_eof(fd, &c);
-	map->obs = get_map_eof(fd, &c);
-	map->ful = get_map_eof(fd, &c);
-	map->obs_count = get_obs_count(fd, map);
+	map.cols = 0;
+	map.rows = get_map_size(fd, &c);
+	map.emp = get_map_eof(fd, &c);
+	map.obs = get_map_eof(fd, &c);
+	map.ful = get_map_eof(fd, &c);
 	close(fd);
-	if (!map->rows || !map->emp || !map->obs || !map->ful || \
-		map->obs_count == -1)
-	{
-		free(map);
-		return (NULL);
-	}
 	return (map);
 }
 
-// int	main(int argc, char *argv[])
-// {
-// 	t_map	*map;
-// 	if (argc < 2)
-// 	{
-// 		// no file passed in, read single file from standard input
-// 	}
-// 	else
-// 	{
-// 		map = map_check(argv[1]);
-// 		if (!map)
-// 			return 1;
-// 		printf("emp=%c\nobs=%c\nful=%c\n", map->emp,map->obs,map->ful);
-// 		printf("obs_count=%d\n", map->obs_count);
-// 		printf("cols=%d\n", map->cols);
-// 		printf("rows=%d\n", map->rows);
-// 	}
-// }
+// returns failure if invalid map
+int	ft_check_map(t_map map)
+{
+	if (!map.rows || !map.emp || !map.obs || !map.ful)
+		return (E_FAILURE);
+	return (E_SUCCESS);
+}
+
+// no file passed in, read single file from standard input
+int	main(int argc, char *argv[])
+{
+	t_map	map;
+	int		fd;
+
+	if (argc == 1)
+		fd = 0;
+	else if (argc == 2)
+		fd = open(argv[1], O_RDONLY);
+	else
+		return (1);
+	if (fd < 0)
+		return (1);
+	map = ft_read_map(fd);
+	if (ft_check_map(map) == E_FAILURE)
+	{
+		write(1, "map error\n", 11);
+	}
+	printf("emp=%c\nobs=%c\nful=%c\n", map.emp, map.obs, map.ful);
+	printf("cols=%d\n", map.cols);
+	printf("rows=%d\n", map.rows);
+}
