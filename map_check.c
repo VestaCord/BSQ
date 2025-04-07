@@ -6,7 +6,7 @@
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:43:04 by jia-lim           #+#    #+#             */
-/*   Updated: 2025/04/07 20:53:44 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/07 21:05:02 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,16 +102,35 @@ t_map	ft_read_map(char *filename)
 	return (map);
 }
 
+// reads to start of map, then starts checking
 // returns failure if inconsistent cols, missing keys, invalid key
+// current only returns error for stdin if \n\n instead of just \n
 int	ft_check_map(char *filename, t_map map)
 {
-	int	fd;
+	int				fd;
+	unsigned int	cols;
+	char			c;
 
+	if (!map.rows || !map.cols || !map.emp || !map.obs || !map.ful)
+		return (E_FAILURE);
 	fd = open(filename, O_RDONLY);
 	if (fd < 0)
 		return (E_FAILURE);
-	if (!map.rows || !map.cols || !map.emp || !map.obs || !map.ful)
-		return (E_FAILURE);
+	cols = 0;
+	while (c != '\n')
+		read(fd, &c, 1);
+	while (read(fd, &c, 1) > 0)
+	{
+		cols++;
+		if ((c != map.emp && c != map.obs && c != map.ful && c && c != '\n') || (cols > map.cols))
+		{
+			close(fd);
+			return (E_FAILURE);
+		}
+		if (c == '\n')
+			cols = 0;
+	}
+	close(fd);
 	return (E_SUCCESS);
 }
 
