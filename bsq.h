@@ -6,7 +6,7 @@
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 16:43:30 by vtian             #+#    #+#             */
-/*   Updated: 2025/04/08 15:49:11 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/08 16:24:09 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,12 @@ typedef struct s_map
 	unsigned int	cols;
 }				t_map;
 
-typedef struct s_point
+typedef struct s_soln
 {
-	int	x;
-	int	y;
-}				t_point;
+	int	size;
+	int	row;
+	int	col;
+}				t_soln;
 
 int	ft_check_map(char *filename, t_map map);
 t_map	ft_read_map(char *filename);
