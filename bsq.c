@@ -6,7 +6,7 @@
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 16:27:28 by vtian             #+#    #+#             */
-/*   Updated: 2025/04/08 16:45:32 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/08 17:25:46 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,11 @@ void	ft_set_square(t_soln soln, char *puzzle, t_map map)
 	int	col;
 
 	row = -1;
-	while (row++ < soln.size)
+	while (++row < soln.size)
 	{
 		col = -1;
-		while (col++ < soln.size)
-		{
+		while (++col < soln.size)
 			ft_set_grid(soln.row + row, soln.col + col, puzzle, map, map.ful);
-		}
 	}
 }
 
@@ -99,29 +97,30 @@ void	ft_set_square(t_soln soln, char *puzzle, t_map map)
 // 	in ft_solve_square
 int	main(int argc, char *argv[])
 {
-	t_map		map;
-	t_soln		soln;
-	char		*filename;
-	char		*puzzle;
-	char		*working;
+	t_map	map;
+	t_soln	soln;
+	char	*filename;
+	char	*puzzle;
+	char	*working;
+	int		i;
 
-	if (argc == 1)
-		filename = F_STDIN;
-	else if (argc == 2)
-		filename = argv[1];
-	else
-		return (1);
-	map = ft_read_map(filename);
-	if (ft_check_map(filename, map) == E_FAILURE)
+	i = 0;
+	while (++i < argc || argc == 1)
 	{
-		write(1, "map error\n", 11);
-		return (1);
+		if (argc == 1)
+			filename = F_STDIN;
+		else
+			filename = argv[i];
+		map = ft_read_map(filename);
+		if (ft_check_map(filename, map) == E_FAILURE)
+			write(1, "map error\n", 11);
+		puzzle = ft_create_grid(filename, map);
+		working = ft_create_grid(F_NULL, map);
+		soln = ft_solve_square(working, puzzle, map);
+		ft_set_square(soln, puzzle, map);
+		ft_print_grid(puzzle, map);
+		free(puzzle);
+		free(working);
 	}
-	puzzle = ft_create_grid(filename, map);
-	working = ft_create_grid(F_NULL, map);
-	soln = ft_solve_square(working, puzzle, map);
-	ft_set_square(soln, puzzle, map);
-	ft_print_grid(puzzle, map);
-	free(puzzle);
-	free(working);
+	return (0);
 }
