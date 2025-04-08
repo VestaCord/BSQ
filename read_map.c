@@ -1,19 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   map_check.c                                        :+:      :+:    :+:   */
+/*   read_map.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:43:04 by jia-lim           #+#    #+#             */
-/*   Updated: 2025/04/08 13:48:05 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/08 15:28:12 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include "bsq.h"
 
 // Returns the number of lines from information on the map
@@ -91,6 +90,7 @@ t_map	ft_read_map(char *filename)
 		map.obs = 0;
 		map.ful = 0;
 		map.cols = 0;
+		close(fd);
 		return (map);
 	}
 	map.rows = ft_get_rows(fd, &c);
@@ -117,6 +117,7 @@ int	ft_check_map(char *filename, t_map map)
 	if (fd < 0)
 		return (E_FAILURE);
 	cols = 0;
+	c = 0;
 	while (c != '\n')
 		read(fd, &c, 1);
 	while (read(fd, &c, 1) > 0)
@@ -135,26 +136,3 @@ int	ft_check_map(char *filename, t_map map)
 	return (E_SUCCESS);
 }
 
-// no file passed in, read single file from standard input
-int	main(int argc, char *argv[])
-{
-	t_map		map;
-	char		*filename;
-	const char	*filename_default = "/dev/stdin";
-
-	if (argc == 1)
-		filename = (char *)filename_default;
-	else if (argc == 2)
-		filename = argv[1];
-	else
-		return (1);
-	map = ft_read_map(filename);
-	if (ft_check_map(filename, map) == E_FAILURE)
-	{
-		write(1, "map error\n", 11);
-		return (1);
-	}
-	printf("emp=%c\nobs=%c\nful=%c\n", map.emp, map.obs, map.ful);
-	printf("cols=%d\n", map.cols);
-	printf("rows=%d\n", map.rows);
-}
