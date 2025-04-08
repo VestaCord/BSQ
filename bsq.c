@@ -6,7 +6,7 @@
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 16:27:28 by vtian             #+#    #+#             */
-/*   Updated: 2025/04/08 15:25:54 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/08 15:44:29 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
-
-int	ft_get_position(int row, int col, int size)
-{
-	int	position;
-
-	position = row * size + col;
-	return (position);
-}
 
 // no file passed in, read single file from standard input
 int	main(int argc, char *argv[])
@@ -46,6 +38,11 @@ int	main(int argc, char *argv[])
 		return (1);
 	}
 	puzzle = ft_create_grid(filename, map);
+	ft_print_grid(puzzle, map);
+	printf("new grid!\n");
+	ft_set_grid(1, 1, puzzle, map, 'X');
+	ft_set_grid(2, 2, puzzle, map, 'X');
+	ft_set_grid(3, 3, puzzle, map, 'X');
 	ft_print_grid(puzzle, map);
 	free(puzzle);
 	printf("emp=%c\nobs=%c\nful=%c\n", map.emp, map.obs, map.ful);
