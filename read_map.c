@@ -6,7 +6,7 @@
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 13:43:04 by jia-lim           #+#    #+#             */
-/*   Updated: 2025/04/08 15:28:12 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/08 16:49:55 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ int	ft_check_map(char *filename, t_map map)
 		read(fd, &c, 1);
 	while (read(fd, &c, 1) > 0)
 	{
-		if ((c != map.emp && c != map.obs && c != map.ful && c
+		if ((c != map.emp && c != map.obs && c
 		&& c != '\n') || ((c == '\n') && cols++ != map.cols))
 		{
 			close(fd);
