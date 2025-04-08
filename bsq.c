@@ -6,7 +6,7 @@
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 16:27:28 by vtian             #+#    #+#             */
-/*   Updated: 2025/04/08 16:44:29 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/08 16:45:32 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,11 +120,6 @@ int	main(int argc, char *argv[])
 	puzzle = ft_create_grid(filename, map);
 	working = ft_create_grid(F_NULL, map);
 	soln = ft_solve_square(working, puzzle, map);
-	ft_print_grid(puzzle, map);
-	printf("emp=%c\nobs=%c\nful=%c\n", map.emp, map.obs, map.ful);
-	printf("cols=%d\n", map.cols);
-	printf("rows=%d\n", map.rows);
-	printf("Solution is (%d, %d) of size %d\n", soln.row, soln.col, soln.size);
 	ft_set_square(soln, puzzle, map);
 	ft_print_grid(puzzle, map);
 	free(puzzle);
