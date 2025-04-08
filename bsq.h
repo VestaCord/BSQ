@@ -6,16 +6,17 @@
 /*   By: vtian <vtian@student.42singapore.sg>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 16:43:30 by vtian             #+#    #+#             */
-/*   Updated: 2025/04/08 15:35:36 by vtian            ###   ########.fr       */
+/*   Updated: 2025/04/08 15:49:11 by vtian            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BSQ_H
 # define BSQ_H
 
-# define GRID_BFFER 1024
 # define E_FAILURE -1
 # define E_SUCCESS 1 
+# define F_STDIN "/dev/stdin"
+# define F_NULL "/dev/null"
 
 typedef struct s_map
 {
